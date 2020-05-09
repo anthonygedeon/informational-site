@@ -3,14 +3,28 @@ const url = require('url');
 const fs = require('fs');
 
 http.createServer((req, res) => {
-    const query = url.parse('http://localhost:8081/index.html', true);
-    const filename = `.${query.pathname}`;
+    const query = url.parse('http://localhost:8080', true);
+    let filename = `.${query.pathname}`;
+    
+    console.log(query.search)
+    
+    if (query.host === 'localhost:8080') {
+        filename = `./index.html`;
+    } else if (filename === './about') {
+        filename = './about.html';
+    } else if (filename === './contact-me') {
+        filename = './contact-me.html';
+    } else if (filename === './index') {
+        filename = './index.html';
+    } else {
+        filename = '404.html';
+    }
     
     fs.readFile(filename, (error, data) => {
 
         if (error) {
             res.writeHead(404, {'Content-type': 'text/html'});
-            return res.end('404 Not Found');
+            return res.end(data);
         }
 
         res.writeHead(200, {'Content-type': 'text/html'});
@@ -18,4 +32,4 @@ http.createServer((req, res) => {
         return res.end()
     })
 
-}).listen(8081);
+}).listen(8080);
