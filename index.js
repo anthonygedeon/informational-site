@@ -20,9 +20,10 @@ http.createServer((req, res) => {
                     res.end(data)
                 }
             });
+		} else {
+			res.writeHead(200, MIME_TEXT_HTML);
+			res.write(data);
+			return res.end();
 		}
-		res.writeHead(200, MIME_TEXT_HTML);
-		res.write(data);
-		return res.end();
 	});
 }).listen(PORT);
