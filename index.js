@@ -6,9 +6,12 @@ const PORT = 3000;
 const HOST = 'localhost';
 
 /**
- * 
- * @param {Object} request 
- * @param {Object} response 
+ * Listens for GET request from <a>...</a> links
+ * It directs to the correct page when a link is clicked
+ * Example:
+ * User clicks on about-me page, the function will be invoked via http.createServer and direct the user to the about-me page
+ * @param {Object} request - Request related information
+ * @param {Object} response - Response relation information
  */
 const requestListener = (request, response) => { 
     const query = url.parse(request.url, true);
@@ -16,6 +19,7 @@ const requestListener = (request, response) => {
     const filename = `${requestedURL}.html`;
     
     fs.readFile(filename, (error, data) => {
+
         if (error) {
 
             fs.readFile('404.html', (error, data) => {
@@ -27,7 +31,7 @@ const requestListener = (request, response) => {
             
             return;
         } 
-        
+
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.write(data);
         return response.end();
