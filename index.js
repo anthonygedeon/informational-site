@@ -3,46 +3,38 @@ const url = require('url');
 const fs = require('fs');
 
 const PORT = 3000;
+const HOST = 'localhost';
 
-http.createServer((req, res) => {
-
-    let htmlPath = '';
+/**
+ * 
+ * @param {Object} request 
+ * @param {Object} response 
+ */
+const requestListener = (request, response) => { 
+    const query = url.parse(request.url, true);
+    const requestedURL = query.pathname === '/' ? './index' : `.${query.pathname}`;
+    const filename = `${requestedURL}.html`;
     
-    const query = url.parse(req.url, true);
-
-    switch(query.path) {
-
-        case '/':
-            htmlPath += 'index.html';
-            break;
-
-        case '/contact-me':
-            htmlPath += 'contact-me.html';
-            break;
-        
-        case '/about':
-            htmlPath += 'about.html';
-            break;
-
-        default:
-            htmlPath += '404.html';
-            break;
-
-    }
-
-    fs.readFile(htmlPath, (error, data) => {
-
-        console.log(htmlPath)
-
+    fs.readFile(filename, (error, data) => {
         if (error) {
-            res.writeHead(404, {'Content-Type': 'text/html'});
-            return res.end(data);
-        }
 
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        return res.end(data);
-
+            fs.readFile('404.html', (error, data) => {
+                if (error) throw error;
+                response.writeHead(404, {'Content-Type': 'text/html'});
+                response.write(data);
+                return response.end();
+            });
+            
+            return;
+        } 
+        
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write(data);
+        return response.end();
     });
+};
 
-
-}).listen(PORT);
+http
+    .createServer(requestListener)
+    .listen(PORT, HOST, 
+    () => console.log(`Listening on PORT: ${PORT} at ${HOST}`));
